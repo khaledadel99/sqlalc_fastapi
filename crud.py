@@ -7,19 +7,22 @@ class CRUD:
         async with async_session() as session:
             statement = select(Note).order_by(Note.id)
             result = await session.execute(statement)
-            return result.scalars()
-        
+            return result.scalars().all()
+
+
+
     async def add(self, async_session:async_sessionmaker[AsyncSession], note:Note):
         async with async_session() as session:
             session.add(note)
             await session.commit()
 
 
+
     async def get_by_id(self, async_session:async_sessionmaker[AsyncSession], note_id:str):
         async with async_session() as session:
             statement = select(Note).filter(Note.id == note_id)
             return await session.execute(statement).scalars().one()
-             
+            
 
 
     async def update(self, async_session:async_sessionmaker[AsyncSession],note_id:str, data):
@@ -29,7 +32,7 @@ class CRUD:
             note.content = data['content']
             await session.commit()
             return note 
-            
+
 
 
     async def delete(self, async_session:async_sessionmaker[AsyncSession], note:Note):
