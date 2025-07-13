@@ -1,38 +1,33 @@
 from fastapi import FastAPI
 
-app = FastAPI(
+app = FastAPI(title="note API", description="this is a simple note app", docs_url="/")
 
-    title="note API",
-    description="this is a simple note app",
-    docs_url="/"
-)
 
-@app.get('/')
+@app.get("/")
 async def hello():
-    return {"messege" : "hello world"}
+    return {"messege": "hello world"}
 
 
-
-@app.get('/notes')
+@app.get("/notes")
 async def get_all_notes():
     pass
 
 
-@app.post('/notes')
+@app.post("/notes")
 async def create_note():
     pass
 
 
-@app.get('/note/{note_id}')
+@app.get("/note/{note_id}")
 async def get_note_by_id(note_id):
     pass
 
 
-@app.patch('/note/{note_id}')
+@app.patch("/note/{note_id}")
 async def update_note(note_id):
-    pass 
+    pass
 
 
-@app.delete('/note/{note_id}')
+@app.delete("/note/{note_id}")
 async def delete_note(note_id):
-    pass 
+    pass
