@@ -20,5 +20,5 @@ class Note(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)
     date_created: Mapped[datetime] = mapped_column(default=datetime.now)
 
-    def __repr__(self) -> str:
-        return f"<note {self.title} at {self.date_created}>"
+    # def __repr__(self) -> str:
+    #     return f"<note {self.title} attttt {self.date_created}>"

@@ -5,7 +5,7 @@ class NoteModel(BaseModel):
     id : str
     title : str
     content : str
-    data_created : datetime
+    date_created : datetime
 
 
     model_config = ConfigDict(
@@ -16,8 +16,3 @@ class NoteModel(BaseModel):
 class NoteCreateModel(BaseModel):
     title : str
     content : str
-
-
-    model_config = ConfigDict(
-        from_attributes=True
-    )

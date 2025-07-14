@@ -22,17 +22,17 @@ db = CRUD()
 async def hello():
     return {"messege": "hello world"}
 
-
+print(NoteModel.__config__)
 @app.get("/notes", response_model=List[NoteModel])
 async def get_all_notes():
     notes = await db.get_all(session)
-    return [NoteModel(**note) for note in notes]
+    return notes
 
 @app.post("/notes", status_code=HTTPStatus.CREATED)
 async def create_note(note_data:NoteCreateModel):
     new_note = Note(
         id = str(uuid.uuid4()),
-        title = note_data.title,
+        title = note_data.title, 
         content = note_data.content,
 
     )
