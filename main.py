@@ -3,10 +3,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from crud import CRUD
 from db import engine
 from schema import NoteModel, NoteCreateModel
-if __name__ == "__main__":
-    print("From:", NoteModel.__module__)
-    print("Has model_config:", hasattr(NoteModel, "model_config"))
-    print("model_config:", getattr(NoteModel, "model_config", None))
 from typing import List
 from models import Note
 import uuid
@@ -15,28 +11,18 @@ from http import HTTPStatus
 app = FastAPI(title="note API", description="this is a simple note app", docs_url="/")
 
 
-session = async_sessionmaker(
+session_maker = async_sessionmaker(
     bind = engine,
     expire_on_commit=False
 )
 
 db = CRUD()
 
-@app.get("/debug")
-async def debug():
-    return {
-        "from": NoteModel.__module__,
-        "has_model_config": hasattr(NoteModel, "model_config"),
-        "model_config": getattr(NoteModel, "model_config", None)
-    }
 
-@app.get("/")
-async def hello():
-    pass
 
 @app.get("/notes", response_model=List[NoteModel])
 async def get_all_notes():
-    notes = await db.get_all(session)
+    notes = await db.get_all(session_maker)
     return notes
 
 @app.post("/notes", status_code=HTTPStatus.CREATED)
@@ -47,22 +33,22 @@ async def create_note(note_data:NoteCreateModel):
         content = note_data.content,
 
     )
-    note = await db.add(session, new_note)
+    note = await db.add(session_maker, new_note)
     return note
 
 @app.get("/note/{note_id}", response_model=NoteModel)
 async def get_note_by_id(note_id):
-    note = await db.get_by_id(session, note_id)
+    note = await db.get_by_id(session_maker, note_id)
     return note
 
 
 @app.patch("/note/{note_id}")
-async def update_note(note_id):
-    pass
+async def update_note(note_id, data: NoteCreateModel):
+    note = await db.update(session_maker, note_id, data)
+    return note
 
 
 @app.delete("/note/{note_id}")
 async def delete_note(note_id):
-    note = await get_note_by_id(note_id)
-    await db.delete(session,note)
+    note = await db.delete(session_maker,note_id)
     return f"note : {note} removed"

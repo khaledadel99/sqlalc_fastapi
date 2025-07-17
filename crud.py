@@ -1,6 +1,6 @@
 from models import Note
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select,delete
 
 class CRUD:
     async def get_all(self,async_session:async_sessionmaker[AsyncSession]):
@@ -18,25 +18,25 @@ class CRUD:
 
 
 
-    async def get_by_id(self, async_session:async_sessionmaker[AsyncSession], note_id:str):
-        async with async_session() as session:
-            statement = select(Note).filter(Note.id == note_id)
-            result = await session.execute(statement)
-            return result.scalars().one()
-            
+    async def get_by_id(self, async_session:AsyncSession, note_id:str):
+        statement = select(Note).filter(Note.id == note_id)
+        result = await async_session.execute(statement)
+        return result.scalars().one()
+        
 
 
-    async def update(self, async_session:async_sessionmaker[AsyncSession],note_id:str, data):
+    async def update(self, async_session:async_sessionmaker[AsyncSession], note_id:str, data):
         async with async_session() as session:
-            note = await self.get_by_id(async_session,note_id)
-            note.title = data['title']
-            note.content = data['content']
+            note = await self.get_by_id(session,note_id)
+            note.title = data.title
+            note.content = data.content
             await session.commit()
             return note 
 
 
 
-    async def delete(self, async_session:async_sessionmaker[AsyncSession], note:Note):
+    async def delete(self, async_session:async_sessionmaker[AsyncSession], note_id:str):
         async with async_session() as session:
-            session.delete(note)
+            stmt = delete(Note).where(Note.id == note_id)
+            await session.execute(stmt)
             await session.commit()
