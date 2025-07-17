@@ -21,7 +21,8 @@ class CRUD:
     async def get_by_id(self, async_session:async_sessionmaker[AsyncSession], note_id:str):
         async with async_session() as session:
             statement = select(Note).filter(Note.id == note_id)
-            return await session.execute(statement).scalars().one()
+            result = await session.execute(statement)
+            return result.scalars().one()
             
 
 

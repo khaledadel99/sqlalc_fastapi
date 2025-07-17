@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from crud import CRUD
 from db import engine
-from serializer import NoteModel, NoteCreateModel
+from schema import NoteModel, NoteCreateModel
+if __name__ == "__main__":
+    print("From:", NoteModel.__module__)
+    print("Has model_config:", hasattr(NoteModel, "model_config"))
+    print("model_config:", getattr(NoteModel, "model_config", None))
 from typing import List
 from models import Note
 import uuid
@@ -18,11 +22,18 @@ session = async_sessionmaker(
 
 db = CRUD()
 
+@app.get("/debug")
+async def debug():
+    return {
+        "from": NoteModel.__module__,
+        "has_model_config": hasattr(NoteModel, "model_config"),
+        "model_config": getattr(NoteModel, "model_config", None)
+    }
+
 @app.get("/")
 async def hello():
-    return {"messege": "hello world"}
+    pass
 
-print(NoteModel.__config__)
 @app.get("/notes", response_model=List[NoteModel])
 async def get_all_notes():
     notes = await db.get_all(session)
@@ -39,9 +50,10 @@ async def create_note(note_data:NoteCreateModel):
     note = await db.add(session, new_note)
     return note
 
-@app.get("/note/{note_id}")
+@app.get("/note/{note_id}", response_model=NoteModel)
 async def get_note_by_id(note_id):
-    pass
+    note = await db.get_by_id(session, note_id)
+    return note
 
 
 @app.patch("/note/{note_id}")
@@ -51,4 +63,6 @@ async def update_note(note_id):
 
 @app.delete("/note/{note_id}")
 async def delete_note(note_id):
-    pass
+    note = await get_note_by_id(note_id)
+    await db.delete(session,note)
+    return f"note : {note} removed"
